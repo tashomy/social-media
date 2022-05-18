@@ -52,7 +52,12 @@ const Post = ({ post, setCurrId }) => {
         {post.title}
       </Typography>
       <CardContent>
-        <Typography variant="h5" gutterBottom>
+        <Typography
+          variant="body2"
+          color="textSecondary"
+          component="p"
+          gutterBottom
+        >
           {post.message}
         </Typography>
       </CardContent>
@@ -65,8 +70,8 @@ const Post = ({ post, setCurrId }) => {
           }}
         >
           <ThumbUpAltIcon fontSize="small" />
-
-          {`Like ${post.likeCount}`}
+          &nbsp;
+          {` Like ${post.likeCount}`}
         </Button>
         <Button
           size="small"
