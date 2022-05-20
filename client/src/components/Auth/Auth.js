@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import useStyles from "./styles";
+import axios from "axios";
+import { useHistory } from "react-router-dom";
 import {
   Avatar,
   Paper,
@@ -8,19 +10,58 @@ import {
   Container,
   Button,
 } from "@material-ui/core";
+import { GoogleLogin } from "@react-oauth/google";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Input from "./Input";
+import Icon from "./icon";
+import { useDispatch } from "react-redux";
+import { useGoogleLogin } from "@react-oauth/google";
 const Auth = () => {
   const classes = useStyles();
+  const dispatch = useDispatch();
+  const history = useHistory();
+
   const [showPassword, setShowPassword] = useState(false);
   const [isSignUp, setisSignUp] = useState(false);
+
   const handleSubmit = () => {};
   const handleChange = () => {};
   const handleShowPassword = () => setShowPassword((prevState) => !prevState);
+
   const switchMode = () => {
     setisSignUp((prevState) => !prevState);
     handleShowPassword(false);
   };
+
+  const googleSuccess = (res) => {
+    console.log(res);
+  };
+
+  const googleFailure = (error) => {
+    console.log(error);
+    console.log(error.details);
+    console.log("Google sign in was unsuccessfull. Try again later");
+  };
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      const token = tokenResponse.access_token;
+      // fetching userinfo can be done on the client or the server
+      const userInfo = await axios
+        .get("https://www.googleapis.com/oauth2/v3/userinfo", {
+          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+        })
+        .then((res) => res.data);
+
+      try {
+        dispatch({ type: "AUTH", data: { userInfo, token } });
+        history.push("/");
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    // flow: 'implicit', // implicit is the default
+  });
   return (
     <Container component="main" maxWidth="xs">
       <Paper className={classes.paper} elevation={3}>
@@ -78,7 +119,14 @@ const Auth = () => {
           >
             {isSignUp ? "Sign up" : "Sign in"}
           </Button>
-          <Grid container justify="flex-end">
+          <GoogleLogin
+            onSuccess={googleLogin}
+            onFailure={googleFailure}
+            cookiePolicy={"single_host_origin"}
+            scope="profile"
+          />
+
+          <Grid container justifyContent="flex-end">
             <Grid item>
               <Button onClick={switchMode}>
                 {isSignUp
