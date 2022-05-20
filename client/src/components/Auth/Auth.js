@@ -16,21 +16,43 @@ import Input from "./Input";
 import Icon from "./icon";
 import { useDispatch } from "react-redux";
 import { useGoogleLogin } from "@react-oauth/google";
+import { signin, signup } from "../../actions/auth";
+
+const initialState = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  password: "",
+  confirmPassword: "",
+};
+
 const Auth = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const history = useHistory();
+  const [formData, setFormData] = useState(initialState);
 
   const [showPassword, setShowPassword] = useState(false);
   const [isSignUp, setisSignUp] = useState(false);
 
-  const handleSubmit = () => {};
-  const handleChange = () => {};
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (isSignUp) {
+      dispatch(signup(formData, history));
+    } else {
+      dispatch(signin(formData, history));
+    }
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
   const handleShowPassword = () => setShowPassword((prevState) => !prevState);
 
   const switchMode = () => {
     setisSignUp((prevState) => !prevState);
-    handleShowPassword(false);
+    setShowPassword(false);
   };
 
   const googleSuccess = (res) => {
@@ -47,14 +69,14 @@ const Auth = () => {
     onSuccess: async (tokenResponse) => {
       const token = tokenResponse.access_token;
       // fetching userinfo can be done on the client or the server
-      const userInfo = await axios
+      const result = await axios
         .get("https://www.googleapis.com/oauth2/v3/userinfo", {
           headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
         })
         .then((res) => res.data);
 
       try {
-        dispatch({ type: "AUTH", data: { userInfo, token } });
+        dispatch({ type: "AUTH", data: { result, token } });
         history.push("/");
       } catch (error) {
         console.log(error);

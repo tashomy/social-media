@@ -3,6 +3,7 @@ import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import cors from "cors";
 import postRoutes from "./routes/posts.js";
+import userRoutes from "./routes/users.js";
 import dotenv from "dotenv";
 import { OAuth2Client } from "google-auth-library";
 
@@ -20,6 +21,7 @@ const oAuth2Client = new OAuth2Client(
 );
 
 app.use("/posts", postRoutes);
+app.use("/users", userRoutes);
 
 app.post("/auth/google", async (req, res) => {
   const { tokens } = await oAuth2Client.getToken(req.body.code); // exchange code for tokens

@@ -13,13 +13,13 @@ const Form = ({ currId, setCurrId }) => {
   );
   const dispatch = useDispatch();
   const [postData, setPostData] = useState({
-    creator: "",
     title: "",
     message: "",
     tags: "",
     selectedFile: "",
   });
   const classes = useStyles();
+  const user = JSON.parse(localStorage.getItem("profile"));
 
   useEffect(() => {
     if (post) setPostData(post);
@@ -28,16 +28,26 @@ const Form = ({ currId, setCurrId }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (currId) {
-      dispatch(updatePost(currId, postData));
+      dispatch(updatePost(currId, { ...postData, name: user?.result?.name }));
     } else {
-      dispatch(createPost(postData));
+      dispatch(createPost({ ...postData, name: user?.result?.name }));
     }
     clear();
   };
+
+  if (!user?.result?.name) {
+    return (
+      <Paper className={classes.paper}>
+        <Typography variant="h6" align="center">
+          Please sign in to create your memories or like others
+        </Typography>
+      </Paper>
+    );
+  }
+
   const clear = () => {
     setCurrId(null);
     setPostData({
-      creator: "",
       title: "",
       message: "",
       tags: "",
@@ -56,16 +66,7 @@ const Form = ({ currId, setCurrId }) => {
         <Typography variant="h6">
           {currId ? "Editing" : "Creating"} a Memory
         </Typography>
-        <TextField
-          name="creator"
-          variant="outlined"
-          label="Creator"
-          fullWidth
-          value={postData.creator}
-          onChange={(e) =>
-            setPostData({ ...postData, creator: e.target.value })
-          }
-        />
+
         <TextField
           name="title"
           variant="outlined"
