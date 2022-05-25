@@ -55,35 +55,6 @@ const Auth = () => {
     setShowPassword(false);
   };
 
-  const googleSuccess = (res) => {
-    console.log(res);
-  };
-
-  const googleFailure = (error) => {
-    console.log(error);
-    console.log(error.details);
-    console.log("Google sign in was unsuccessfull. Try again later");
-  };
-
-  const googleLogin = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
-      const token = tokenResponse.access_token;
-      // fetching userinfo can be done on the client or the server
-      const result = await axios
-        .get("https://www.googleapis.com/oauth2/v3/userinfo", {
-          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
-        })
-        .then((res) => res.data);
-
-      try {
-        dispatch({ type: "AUTH", data: { result, token } });
-        history.push("/");
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    // flow: 'implicit', // implicit is the default
-  });
   return (
     <Container component="main" maxWidth="xs">
       <Paper className={classes.paper} elevation={3}>
@@ -141,12 +112,6 @@ const Auth = () => {
           >
             {isSignUp ? "Sign up" : "Sign in"}
           </Button>
-          <GoogleLogin
-            onSuccess={googleLogin}
-            onFailure={googleFailure}
-            cookiePolicy={"single_host_origin"}
-            scope="profile"
-          />
 
           <Grid container justifyContent="flex-end">
             <Grid item>
