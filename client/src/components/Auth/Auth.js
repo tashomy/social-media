@@ -67,14 +67,16 @@ const Auth = () => {
 
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
+      console.log(tokenResponse);
       const token = tokenResponse.access_token;
+
       // fetching userinfo can be done on the client or the server
       const result = await axios
         .get("https://www.googleapis.com/oauth2/v3/userinfo", {
           headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
         })
         .then((res) => res.data);
-
+      console.log(result, "result");
       try {
         dispatch({ type: "AUTH", data: { result, token } });
         history.push("/");

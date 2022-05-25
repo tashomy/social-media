@@ -14,18 +14,14 @@ app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors());
 
-const oAuth2Client = new OAuth2Client(
-  process.env.CLIENT_ID,
-  process.env.CLIENT_SECRET,
-  "postmessage"
-);
-
 app.use("/posts", postRoutes);
 app.use("/users", userRoutes);
 
+const oAuth2Client = new OAuth2Client(process.env.CLIENT_ID);
+
 app.post("/auth/google", async (req, res) => {
   const { tokens } = await oAuth2Client.getToken(req.body.code); // exchange code for tokens
-  // console.log(tokens);
+  console.log(tokens);
 
   res.json(tokens);
 });
